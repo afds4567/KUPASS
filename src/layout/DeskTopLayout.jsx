@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import DesktopNavbar from "../components/Nav/DesktopNavbar";
 
 export default function DeskTopLayout(props) {
   const location = useLocation();
@@ -11,6 +12,7 @@ export default function DeskTopLayout(props) {
         height: "100%",
       }}
     >
+      <DesktopNavbar />
       <div
         style={{
           display: "flex",
