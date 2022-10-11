@@ -6,6 +6,7 @@ import {
   Content,
   CreatedAt,
   Tag,
+  TagContainer,
   TagContent,
   Thumbnail,
   ThumbnailContainer,
@@ -49,19 +50,13 @@ export default function PostCard({ post }) {
         <Content thumbnail={post.thumbnail}>
           <p>{post.content}</p>
         </Content>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-          }}
-        >
+        <TagContainer>
           <TagContent className="tag_list">
             {Object.keys(post.tags).map((key) => (
               <Tag key={key}>{post.tags[key]}</Tag>
             ))}
           </TagContent>
-        </div>
+        </TagContainer>
       </CardBody>
     </Card>
   );

@@ -83,6 +83,12 @@ export const TagContent = styled.div`
   flex-wrap: wrap;
 `;
 
+export const TagContainer = styled.div`
+  display: flex;
+  flexdirection: column;
+  justifycontent: space-between;
+`;
+
 export const Tag = styled.div`
   font-size: 0.8rem;
   margin-left: 0.5rem;
