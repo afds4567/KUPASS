@@ -1,64 +1,65 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import PostCard from "./components/PostCard";
+import axios from "axios";
 
-const feeds = [
-  {
-    id: "1",
-    thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-    title: "제목1 예시",
-    content: `KT, 이 경우 단가가 가장 높은 점부터 차례로 채워나가면 되는데 이 그림에서는 C의 단가 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
-    createdAt: `2022/09/25 10:43`,
-    company: "뉴시스",
-    tags: ["AI", "KT"],
-    address:
-      "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
-  },
-  {
-    id: "2",
-    //thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-    title: "제목2 예시",
-    content: `KT,우선 앞서 단가 기준으로 알고리즘을 설명한 그대로 구현하기 위해 단가를 계산하고 역순으로 정렬한다. 즉 가장 단가가 높은 점이 맨 위에 오도록 다음과 같이 구현한다. 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
-    createdAt: `2022/09/25 10:43`,
-    company: "뉴시스",
-    tags: ["AI", "알고리즘"],
-    address:
-      "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
-  },
-  {
-    id: "3",
-    thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-    title: "제목1 예시",
-    content: `KT, 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
-    age: `2022/09/25 10:43`,
-    company: "뉴시스",
-    tags: ["AI", "KT"],
-    address:
-      "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
-  },
-  {
-    id: "4",
-    thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-    title: "제목1 예시",
-    content: `KT, 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
-    age: `2022/09/25 10:43`,
-    company: "뉴시스",
-    tags: ["AI", "KT"],
-    address:
-      "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
-  },
-  {
-    id: "5",
-    thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-    title: "제목1 예시",
-    content: `KT, 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
-    age: `2022/09/25 10:43`,
-    company: "뉴시스",
-    tags: ["AI", "KT"],
-    address:
-      "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
-  },
-];
+// const feeds = [
+//   {
+//     id: "1",
+//     thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
+//     title: "제목1 예시",
+//     content: `KT, 이 경우 단가가 가장 높은 점부터 차례로 채워나가면 되는데 이 그림에서는 C의 단가 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
+//     createdAt: `2022/09/25 10:43`,
+//     company: "뉴시스",
+//     tags: ["AI", "KT"],
+//     address:
+//       "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
+//   },
+//   {
+//     id: "2",
+//     //thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
+//     title: "제목2 예시",
+//     content: `KT,우선 앞서 단가 기준으로 알고리즘을 설명한 그대로 구현하기 위해 단가를 계산하고 역순으로 정렬한다. 즉 가장 단가가 높은 점이 맨 위에 오도록 다음과 같이 구현한다. 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
+//     createdAt: `2022/09/25 10:43`,
+//     company: "뉴시스",
+//     tags: ["AI", "알고리즘"],
+//     address:
+//       "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
+//   },
+//   {
+//     id: "3",
+//     thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
+//     title: "제목1 예시",
+//     content: `KT, 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
+//     age: `2022/09/25 10:43`,
+//     company: "뉴시스",
+//     tags: ["AI", "KT"],
+//     address:
+//       "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
+//   },
+//   {
+//     id: "4",
+//     thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
+//     title: "제목1 예시",
+//     content: `KT, 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
+//     age: `2022/09/25 10:43`,
+//     company: "뉴시스",
+//     tags: ["AI", "KT"],
+//     address:
+//       "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
+//   },
+//   {
+//     id: "5",
+//     thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
+//     title: "제목1 예시",
+//     content: `KT, 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
+//     age: `2022/09/25 10:43`,
+//     company: "뉴시스",
+//     tags: ["AI", "KT"],
+//     address:
+//       "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
+//   },
+// ];
 const Post = styled.div`
   display: flex;
   justify-content: center;
@@ -130,6 +131,32 @@ const PostNone = styled.div`
 `;
 
 export default function PostList() {
+  const [feeds, setFeeds] = useState([]);
+  const [isLast, setIsLast] = useState(false);
+  const [page, setPage] = useState(1);
+
+  const getFeeds = async () => {
+    const params = { page };
+    //axios.defaults.withCredentials = true;
+    try {
+      const res = await axios.get("https://api.punkapi.com/v2/beers?", {
+        params,
+      });
+      //const feeds = res.data.data;
+      const feeds = res.data;
+      //const isLast = res.data.totalPages === page;
+      const isLast = page === 10;
+      setFeeds((prev) => [...prev, ...feeds]);
+      setIsLast(isLast);
+      console.log(page, isLast);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  useEffect(() => {
+    !isLast && getFeeds();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
   return (
     <Post>
       <PostTop>
@@ -154,7 +181,12 @@ export default function PostList() {
       <PostCards listEmpty={feeds.length === 0}>
         {feeds.length !== 0 ? (
           feeds.map((feed, idx) => (
-            <PostCard key={("postcard", idx)} post={feed} />
+            <PostCard
+              key={("postcard", idx)}
+              isLastItem={feeds.length - 1 === idx}
+              onFetchMoreFeeds={() => setPage((prev) => prev + 1)}
+              post={feed}
+            />
           ))
         ) : (
           <PostNone>Contents 없음</PostNone>
