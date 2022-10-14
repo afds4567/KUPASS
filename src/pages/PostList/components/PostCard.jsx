@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import useIntersectionObserver from "../../../hooks/useIntersectionObserver";
 import {
   Card,
   CardBody,
@@ -13,8 +14,12 @@ import {
   Title,
 } from "./PostCardStyled";
 
-export default function PostCard({ post }) {
+export default function PostCard({ post, isLastItem, onFetchMoreFeeds }) {
   const navigate = useNavigate();
+  const ref = useRef(null);
+  const entry = useIntersectionObserver(ref, {});
+  const isIntersecting = !!entry?.isIntersecting;
+
   const handleTagsStyle = () => {
     const tags = document.querySelectorAll(".tag_list");
 
@@ -33,27 +38,32 @@ export default function PostCard({ post }) {
   useEffect(() => {
     handleTagsStyle();
   });
+  useEffect(() => {
+    isLastItem && isIntersecting && onFetchMoreFeeds();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLastItem, isIntersecting]);
   return (
     <Card
+      ref={ref}
       onClick={() => {
         navigate(`article/${post.id}`);
       }}
     >
-      {post.thumbnail && (
+      {post.image_url && (
         <ThumbnailContainer>
-          <Thumbnail src={post.thumbnail} />
+          <Thumbnail src={post.image_url} />
         </ThumbnailContainer>
       )}
-      <CardBody thumbnail={post.thumbnail}>
-        <Title>{post.title}</Title>
-        <CreatedAt>{post.createdAt}</CreatedAt>
-        <Content thumbnail={post.thumbnail}>
-          <p>{post.content}</p>
+      <CardBody thumbnail={post.image_url}>
+        <Title>{post.name}</Title>
+        <CreatedAt>{post.first_brewed}</CreatedAt>
+        <Content thumbnail={post.image_url}>
+          <p>{post.description}</p>
         </Content>
         <TagContainer>
           <TagContent className="tag_list">
-            {Object.keys(post.tags).map((key) => (
-              <Tag key={key}>{post.tags[key]}</Tag>
+            {Object.keys(post.volume).map((key) => (
+              <Tag key={key}>{post.volume[key]}</Tag>
             ))}
           </TagContent>
         </TagContainer>
