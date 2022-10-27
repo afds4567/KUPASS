@@ -46,7 +46,7 @@ export default function PostCard({ post, isLastItem, onFetchMoreFeeds }) {
     <Card
       ref={ref}
       onClick={() => {
-        navigate(`article/${post.id}`);
+        navigate(`article/${post.articleId}`);
       }}
     >
       {post.image_url && (
@@ -55,15 +55,15 @@ export default function PostCard({ post, isLastItem, onFetchMoreFeeds }) {
         </ThumbnailContainer>
       )}
       <CardBody thumbnail={post.image_url}>
-        <Title>{post.name}</Title>
-        <CreatedAt>{post.first_brewed}</CreatedAt>
+        <Title>{post.title}</Title>
+        <CreatedAt>{post.createDate}</CreatedAt>
         <Content thumbnail={post.image_url}>
-          <p>{post.description}</p>
+          <p>{post.summary}</p>
         </Content>
         <TagContainer>
           <TagContent className="tag_list">
-            {Object.keys(post.volume).map((key) => (
-              <Tag key={key}>{post.volume[key]}</Tag>
+            {post.keywords.map((key) => (
+              <Tag key={key}>{key}</Tag>
             ))}
           </TagContent>
         </TagContainer>

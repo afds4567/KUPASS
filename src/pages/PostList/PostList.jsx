@@ -2,71 +2,16 @@ import React, { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import PostCard from "./components/PostCard";
 import axios from "axios";
-
-// const feeds = [
-//   {
-//     id: "1",
-//     thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-//     title: "제목1 예시",
-//     content: `KT, 이 경우 단가가 가장 높은 점부터 차례로 채워나가면 되는데 이 그림에서는 C의 단가 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
-//     createdAt: `2022/09/25 10:43`,
-//     company: "뉴시스",
-//     tags: ["AI", "KT"],
-//     address:
-//       "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
-//   },
-//   {
-//     id: "2",
-//     //thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-//     title: "제목2 예시",
-//     content: `KT,우선 앞서 단가 기준으로 알고리즘을 설명한 그대로 구현하기 위해 단가를 계산하고 역순으로 정렬한다. 즉 가장 단가가 높은 점이 맨 위에 오도록 다음과 같이 구현한다. 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
-//     createdAt: `2022/09/25 10:43`,
-//     company: "뉴시스",
-//     tags: ["AI", "알고리즘"],
-//     address:
-//       "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
-//   },
-//   {
-//     id: "3",
-//     thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-//     title: "제목1 예시",
-//     content: `KT, 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
-//     age: `2022/09/25 10:43`,
-//     company: "뉴시스",
-//     tags: ["AI", "KT"],
-//     address:
-//       "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
-//   },
-//   {
-//     id: "4",
-//     thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-//     title: "제목1 예시",
-//     content: `KT, 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
-//     age: `2022/09/25 10:43`,
-//     company: "뉴시스",
-//     tags: ["AI", "KT"],
-//     address:
-//       "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
-//   },
-//   {
-//     id: "5",
-//     thumbnail: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-//     title: "제목1 예시",
-//     content: `KT, 테이블매니저에 전략 투자…'AI통화비서' 서비스 고도화`,
-//     age: `2022/09/25 10:43`,
-//     company: "뉴시스",
-//     tags: ["AI", "KT"],
-//     address:
-//       "AI통화비서 서비스 고도화 및 사업영역 확장을 위해 협력 KT “소상공인들에게 도움이 되는 AI 통화비서로 만들 것”",
-//   },
-// ];
+import { useQuery } from "react-query";
+import { useLocation, useSearchParams } from "react-router-dom";
+import { storage } from "../../utils";
 const Post = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
   width: 100%;
   margin: auto;
-
+  margin-bottom: 1rem;
   @media only screen and (max-width: 768px) {
     margin-top: 2rem;
     margin-left: 0;
@@ -104,13 +49,14 @@ const PostCards = styled.div`
   flex-wrap: wrap;
   //justify-content: space-between;
   width: 100%;
+  margin-bottom: 1rem;
   ${(props) =>
     props.listEmpty
       ? css`
-          height: 100vh;
+          height: 80vh;
         `
       : css`
-          height: 100vh;
+          height: 80vh;
         `}
   @media only screen and (max-width: 768px) {
     justify-content: center;
@@ -131,19 +77,43 @@ const PostNone = styled.div`
 `;
 
 export default function PostList() {
+  const location = useLocation();
+  const searchMatch = location.pathname == "/search";
+  const [serachParams, _] = useSearchParams();
+  const keyword = serachParams.get("keyword");
+  const [filter, setFilter] = useState("default");
   const [feeds, setFeeds] = useState([]);
   const [isLast, setIsLast] = useState(false);
-  const [page, setPage] = useState(1);
-
+  const [page, setPage] = useState(0);
+  const { data: keywords } = useQuery("keywords", {
+    initialData: "",
+    staleTime: Infinity,
+  });
+  const {
+    data: { title, item, isTag },
+  } = useQuery("title", {
+    initialData: "",
+    staleTime: Infinity,
+  });
   const getFeeds = async () => {
-    const params = { page };
+    let params;
+    if (keyword)
+      params = {
+        keyword: keyword,
+        page,
+        ordered_by: filter,
+      };
+    else params = { keyword, page, ordered_by: filter, category: "" };
     //axios.defaults.withCredentials = true;
     try {
-      const res = await axios.get("https://api.punkapi.com/v2/beers?", {
+      axios.defaults.headers.common.Authorization = `Bearer ${storage.getToken()}`;
+      const res = await axios.get("/api/search/article", {
         params,
       });
       //const feeds = res.data.data;
-      const feeds = res.data;
+      const feeds = res.data.articles;
+      console.log(feeds);
+
       //const isLast = res.data.totalPages === page;
       const isLast = page === 10;
       setFeeds((prev) => [...prev, ...feeds]);
@@ -156,7 +126,11 @@ export default function PostList() {
   useEffect(() => {
     !isLast && getFeeds();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  }, [page, filter]);
+
+  const handleFilter = (e) => {
+    setFilter(e.target.value);
+  };
   return (
     <Post>
       <PostTop>
@@ -167,8 +141,13 @@ export default function PostList() {
             width: "100%",
           }}
         >
-          <p style={{ fontSize: "2rem", color: "blue" }}>관심태그</p>
-          <Select>
+          <p style={{ fontSize: "2rem", color: "blue" }}>
+            {title ? (searchMatch ? keyword : title) : title}
+          </p>
+          <Select onChange={handleFilter} value={filter}>
+            <option className="option" value="default">
+              기본순
+            </option>
             <option className="option" value="score">
               인기순
             </option>
@@ -178,7 +157,7 @@ export default function PostList() {
           </Select>
         </div>
       </PostTop>
-      <PostCards listEmpty={feeds.length === 0}>
+      <PostCards style={{ overflow: "auto" }} listEmpty={feeds.length === 0}>
         {feeds.length !== 0 ? (
           feeds.map((feed, idx) => (
             <PostCard

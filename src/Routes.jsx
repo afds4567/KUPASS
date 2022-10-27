@@ -12,7 +12,8 @@ const Router = () => {
         <Routes>
           <Route path="/register" element={<Register />} />
           <Route path="/signin" element={<SignIn />} />
-          <Route path="/" element={<PostList />} />
+          <Route path="/home" element={<PostList />}></Route>
+          <Route path="/search" element={<PostList />} />
         </Routes>
       </ResponsiveLayout>
     </BrowserRouter>

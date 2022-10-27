@@ -5,8 +5,13 @@ import { Icon } from "semantic-ui-react";
 
 //import "react-minimal-side-navigation/lib/ReactMinimalSideNavigation.css";
 import "../../styles/sidebar.css";
+import { storage } from "../../utils";
+import { useEffect } from "react";
+import { useQuery } from "react-query";
+import { queryclient } from "../../lib/react-query";
 const Bar = styled.div`
   position: sticky;
+  top: 10rem;
   margin-top: 10rem;
   width: 10.5rem;
   height: 100%;
@@ -14,12 +19,49 @@ const Bar = styled.div`
 
 export default function DesktopSideBar() {
   const navigate = useNavigate();
+  const setArr = [];
+  const { data: keywords } = useQuery("keywords", {
+    initialData: " ",
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    const { token } = storage.getToken() || null;
+    if (keywords) {
+      console.log(keywords);
+      keywords.forEach((keyword) => {
+        const curObj = {};
+        console.log(keyword);
+        curObj.title = keyword;
+        curObj.itemId = `/tags/${keyword}`;
+        setArr.push(curObj);
+      });
+    }
+  }, []);
 
   return (
     <>
       <Bar>
         <Navigation
-          onSelect={({ itemId }) => {}}
+          onSelect={({ itemId }) => {
+            if (typeof itemId === "object") {
+              queryclient.setQueryData("title", {
+                item: `${itemId.item}`,
+                title: `${itemId.title}`,
+                isTag: false,
+              });
+              navigate(`/home?menu=${itemId.title}`);
+            }
+            if (typeof itemId === "string") {
+              queryclient.setQueryData("title", {
+                item: `${itemId.slice(6)}`,
+                title: `${itemId.slice(6)}`,
+                isTag: true,
+              });
+              if (itemId.length >= 6)
+                navigate(`/search?keyword=${itemId.slice(6)}`);
+            }
+          }}
           items={[
             {
               title: "피드",
@@ -35,20 +77,20 @@ export default function DesktopSideBar() {
               elemBefore: () => (
                 <Icon name="tags" style={{ fontSize: "1.2rem" }} />
               ),
-              subNav: [
-                {
-                  title: "Projects",
-                  itemId: "/management/projects",
-                  // Requires v1.9.1+ (https://github.com/abhijithvijayan/react-minimal-side-navigation/issues/13)
-                  elemBefore: () => <Icon name="cloud-snow" />,
-                },
-                {
-                  title: "Members",
-                  itemId: "/management/members",
-                  elemBefore: () => <Icon name="coffee" />,
-                },
-              ],
-              //subNav: user ? setArr : null,
+              subNav: keywords ? setArr : null,
+              //[
+              // {
+              //   title: "Projects",
+              //   itemId: "/management/projects",
+              //   // Requires v1.9.1+ (https://github.com/abhijithvijayan/react-minimal-side-navigation/issues/13)
+              //   elemBefore: () => <Icon name="cloud-snow" />,
+              // },
+              // {
+              //   title: "Members",
+              //   itemId: "/management/members",
+              //   elemBefore: () => <Icon name="coffee" />,
+              // },
+              //],
             },
             {
               title: "북마크",

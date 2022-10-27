@@ -5,7 +5,7 @@ export const Card = styled.div`
   flex-direction: column;
   position: relative;
   cursor: pointer;
-  width: 18.85rem;
+  width: 18rem;
   height: 20rem;
   margin: 1rem;
   background-color: white;
@@ -80,13 +80,15 @@ export const TagContent = styled.div`
   display: flex;
   margin-left: 0.5rem;
   margin-top: 1rem;
-  flex-wrap: wrap;
+  flex-flow: wrap;
+  flex-wrap: warp;
 `;
 
 export const TagContainer = styled.div`
   display: flex;
-  flexdirection: column;
-  justifycontent: space-between;
+  //flex-direction: column;
+  justify-content: space-between;
+  flex-wrap: wrap;
 `;
 
 export const Tag = styled.div`

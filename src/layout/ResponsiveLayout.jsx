@@ -10,20 +10,22 @@ export default function ResponsiveLayout({ children }) {
   const [isAuth, setisAuth] = useState(false);
   const location = useLocation();
   useEffect(() => {
-    if (location === ("/register" || "/signin")) {
+    if (location == ("/register" || "/signin")) {
       setisAuth(true);
+    } else {
+      setisAuth(false);
     }
   }, [location]);
 
   let isRegister = false;
   let isSignIn = false;
   const SignUp = () => {
-    isRegister = window.location.pathname === "/register";
+    isRegister = location.pathname == "/register";
     if (isRegister) setisAuth(true);
     return isRegister && <Register />;
   };
   const Login = () => {
-    isSignIn = window.location.pathname === "/signin";
+    isSignIn = location.pathname == "/signin";
     if (isSignIn) setisAuth(true);
     return isSignIn && <SignIn />;
   };
@@ -37,10 +39,16 @@ export default function ResponsiveLayout({ children }) {
   };
   return (
     <div>
-      <SignUp />
-      <Login />
-      <Desktop />
-      <Mobile />
+      {/* <SignUp />
+      <Login /> */}
+      {location == ("/register" || "/signin") ? (
+        <>{children}</>
+      ) : (
+        <>
+          <Desktop />
+          <Mobile />
+        </>
+      )}
     </div>
   );
 }

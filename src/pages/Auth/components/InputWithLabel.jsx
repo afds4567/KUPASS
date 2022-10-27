@@ -21,6 +21,7 @@ const Input = styled.input`
   font-size: 1.2rem;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+  type:${(props) => (props.type ? props.type : null)}
   ::placeholder {
     color: #e9ecef;
   }
