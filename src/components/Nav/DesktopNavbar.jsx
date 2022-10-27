@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import kupass from "../../images/logo.PNG";
 import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { queryclient } from "../../lib/react-query";
 
 const Nav = styled.nav`
   position: fixed;
@@ -24,7 +26,7 @@ const Logo = styled.img`
   height: auto;
 `;
 
-const Search = styled.div`
+const Search = styled.form`
   color: black;
   display: flex;
   margin-right: 2rem;
@@ -52,6 +54,13 @@ const Login = styled.button`
 `;
 export default function DesktopNavbar() {
   const [searchOpen, setSearchOpen] = useState(false);
+
+  const { register, handleSubmit } = useForm();
+  const naviagte = useNavigate();
+  const onValid = (data) => {
+    naviagte(`/search?keyword=${data.keyword}`);
+    queryclient.invalidateQueries("title");
+  };
   const toggleSearch = () => setSearchOpen((prev) => !prev);
   return (
     <Nav>
@@ -64,7 +73,7 @@ export default function DesktopNavbar() {
           position: "relative",
         }}
       >
-        <Search>
+        <Search onSubmit={handleSubmit(onValid)}>
           <motion.svg
             onClick={toggleSearch}
             animate={{ x: searchOpen ? -180 : 0 }}
@@ -80,12 +89,13 @@ export default function DesktopNavbar() {
             ></path>
           </motion.svg>
           <Input
+            {...register("keyword", { required: true, minLength: 2 })}
             transition={{ type: "linear" }}
             animate={{ scaleX: searchOpen ? 1 : 0 }}
             placeholder="검색어를 입력하세요"
           />
         </Search>
-        <Link to="/">
+        <Link to="/signin">
           <Login>로그인</Login>
         </Link>
       </div>
